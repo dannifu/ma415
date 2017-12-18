@@ -223,11 +223,11 @@ par(mfrow=c(1,2))
 plot(model_fl,1)
 plot(model_fl,2)
 ```
-The listed_count is the number of public lists that this user is a member of. Based on the p-value of the model of listed_count and followers_count, the simple linear regression is significant. We can see that the more public lists that this user is a memeber of, more follower the user have. As list increase by 1 , the follower count will increase by approximately 109
+The listed_count is the number of public lists that this user is a member of. Based on the p-value of the model of listed_count and followers_count, the simple linear regression is significant. Considering the potential outliers and high leverage point, there might be randonness in the residual plot. We can see that the more public lists that this user is a memeber of, more follower the user have. As list increase by 1 , the follower count will increase by approximately 109.
 
 
+Then, to further study the social media impact in different cities, the follower count distribution is computated.
 ```{r}
-##Then, to further study the social media impact in different cities, the follower count distribution is computated.
 #add ggplot code
 a <- ggplot(data=tweets.df, aes(followers_count)) +
   geom_histogram(breaks = seq(0,5000,by=250),
