@@ -10,6 +10,11 @@ Nowadays, as rapid growth of usage of internet, social media plays a larger and 
 
 In order to figure out what Twitter users, are talking about Christmas, all the tweets contains hashtag about Christmas and the geographical location info are collected, researches about regions that has the majority celebrate christmas and related analysis would be useful for commercial purposes.
 
+
+## II Dataset Summary
+
+In this project, all the data come from Twitter. The data of this project includes tweets mentioning christmas collecting in 30 mins at around 1 pm in Eastern stardard time..
+  
 ```{r setup, include = FALSE}
 # prepare packages
 library(ROAuth)
@@ -80,7 +85,9 @@ write.csv(tweets.df,"tweets_df.csv")
 #yoo
 
 ```
+##After searching tweets for 30 mins, cleaning it and obtaining locations' information, I get a data frames with all the information including listed counts,statuse count, followers count, favourites count,time zone, country code, city, states, longitude, latitude.
 
+##To have a general of views of the distribution of those tweets especially in different cities in US, we use mapping to see which cities might be my insteret of studies.
 ```{r}
 
 # install.packages("ggmap")
@@ -116,6 +123,13 @@ qmplot(place_lon, place_lat, data = tweets.df, colour = I('red'), size = I(2),
        mapcolor = "bw",main="USA")
 ```
 ##According to the map of the christmas tweets, we can see most of the tweets are mainly from coastal states,like New York, California and Massachusetts, which are the cities for bussiness, fashion and so on. So the next step is to have a closer study of those three states.
+
+
+II Statistical Analysis
+Having the targeted states, Some question below will be explored:
+1. Whether different cities has different christmas atmosphere.
+2. Whether location of the cities affect the popularity of tweets.
+3. What is significant relationship between each pair of different information countable factors of the users, like followers, favorites, lists that uses belong to and so on.
 
 ```{r}
 #add new variable state
@@ -177,7 +191,7 @@ uscityplot <- ggplot(us_city_count,aes(reorder(rownames(us_city_count),count),co
   geom_bar(stat = "identity")+coord_flip()+xlab("City")+ggtitle("US")
 uscityplot
 ```
-## 
+
 ```{r}
 pairs(~listed_count+statuses_count+followers_count+favourites_count+friends_count, data=total_us)
 
