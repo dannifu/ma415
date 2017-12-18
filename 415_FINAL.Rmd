@@ -88,8 +88,14 @@ write.csv(tweets.df,"tweets_df.csv")
 After searching tweets for 30 mins, cleaning it and obtaining locations' information, I get a data frames with all the information including listed counts,statuse count, followers count, favourites count,time zone, country code, city, states, longitude, latitude.
 
 
+
+## III. Mapping
+
 To have a general of views of the distribution of those tweets especially in different cities in US, we use mapping to see which cities might be my insteret of studies.
+
+
 ```{r}
+
 
 # install.packages("ggmap")
 library(ggmap)
@@ -125,7 +131,10 @@ qmplot(place_lon, place_lat, data = tweets.df, colour = I('red'), size = I(2),
 ```
 According to the map of the christmas tweets, we can see most of the tweets are mainly from coastal states,like New York, California and Massachusetts, which are the cities for bussiness, fashion and so on. So the next step is to have a closer study of those three states.
 
-## III Statistical Analysis 
+
+
+## IV Statistical Analysis 
+
 Having the targeted states, Some question below will be explored:
 1. Whether different cities has different christmas atmosphere.
 2. Whether location of the cities affect the popularity of tweets.
@@ -191,6 +200,7 @@ uscityplot <- ggplot(us_city_count,aes(reorder(rownames(us_city_count),count),co
   geom_bar(stat = "identity")+coord_flip()+xlab("City")+ggtitle("US")
 uscityplot
 ```
+According to plots, Manhattan is the cities where those christmas tweets are from. 
 
 ```{r}
 pairs(~listed_count+statuses_count+followers_count+favourites_count+friends_count, data=total_us)
@@ -227,7 +237,7 @@ a <- ggplot(data=tweets.df, aes(followers_count)) +
 #printing the graphs
 print(a)
 ```
-##From the followers count distribution in US, we can see that most of those christmas tweets are from blogger with under 1000 followers. So we can see public use tweets to celebrate christma. More follower the blogger have more impact the tweets might bring to the public, so we can see the christmas tweets will bring a great impact to the public to celebrate the holidays.
+From the followers count distribution in US, we can see that most of those christmas tweets are from blogger with under 1000 followers. So we can see public use tweets to celebrate christma. More follower the blogger have more impact the tweets might bring to the public, so we can see the christmas tweets will bring a great impact to the public to celebrate the holidays.
 
 ```{r}
 #ggplot code for followers count distribution in California
@@ -263,7 +273,14 @@ f <- ggplot(data=ny, aes(followers_count)) +
 #printing the graphs
 print(f)
 ```
-##Comparing the followers distribution in big and socialable states like California, Massachusetts and New York, we can see that New York's christmas tweets are from blogger with the most followers, which is understandable since there are most population and companies there. Twitter plays a much larger role in public's life and work. in New York. Generally, we can see that Massachussets has the least tweets which might be due the data is collected during the final period, and the majority of sociable population in MA is students who did't tweet that much at that time. For California, there is moderate tweets with moderate followers.
+Comparing the followers distribution in big and socialable states like California, Massachusetts and New York, we can see that New York's christmas tweets are from blogger with the most followers, which is understandable since there are most population and companies there. Twitter plays a much larger role in public's life and work. in New York. Generally, we can see that Massachussets has the least tweets which might be due the data is collected during the final period, and the majority of sociable population in MA is students who did't tweet that much at that time. For California, there is moderate tweets with moderate followers.
 
+
+## V. Shiny
+
+
+## VI. Future Improvements 
+
+The data that I get from 30 mins searching of christmas is about over ten thousands of data; however, after filtering tweets with valid location information and english languages, there is only 3000 datas left. In addition, the target is United states, the dataset is even smaller which might be not convincing enough to draw our conclusion. What's more, as the data are collected around 12pm in Eastern Stardard time, the california time is around morning, which might affect our results since people usually tweets more during lunch break than the busy morning. To avoid any bias of the study, I might collect more data by searching of christmas tag for longer and in different time periods of the day. To extend the study of social media effect, we might study other social media, like instagram, facebook and so on.
 
 
