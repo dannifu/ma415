@@ -1,0 +1,250 @@
+---
+title: "Final_Proj"
+author: "Danni Fu"
+date: "2017/12/15"
+output: pdf_document
+---
+#introduction
+Nowadays, as rapid growth of usage of internet, social media plays a larger and larger role on the daily life of the public. The social media can reflect different cities' atmosphere of holidays. Also bloggers with a lot of followers can affect the costumers' shopping decisions. Then, the another role Twitter can play in Christmas is social marketing, since it can released a new infographic which outlines the opportunities on Twitter for marketers ahead of the holiday season. With the use of Twitter API, all the tweets contains hashtag about Christmas and the geographical location info are collected, researches about regions that has the majority celebrate christmas and related analysis would be useful for commercial purposes. 
+
+```{r setup, include = FALSE}
+# prepare packages
+library(ROAuth)
+library(streamR)
+library(twitteR)
+library(tm)
+library(SnowballC)
+library(ggplot2)
+library(ggvis)
+library(ggmap)
+library(grid) 
+library(dplyr)
+library(wordcloud)
+library(plyr)
+library(stringr)
+library(dplyr)
+library(wordcloud)
+library(gridExtra)
+library(topicmodels)
+```
+
+
+```{r}
+# set up connection
+#requestURL <- "https://api.twitter.com/oauth/request_token"
+#accessURL <- "https://api.twitter.com/oauth/access_token"
+#authURL <- "https://api.twitter.com/oauth/authorize"
+#api_key <- 	"GGD6XUROrlweJRDBCPfeoFCke"
+#api_secret <- "LWvS1jwNcjir4wFbYT9tvQ1hmwpqn9Ko1VdxwhrEEWHEUICkcm"
+#access_token <- "940364005654360064-ENMUkOgVIvxgkwtWDIMwX1QpLTjPSqp"
+#access_token_secret <- "1tbt9o6HXsPRzFIfeCAuRv9kE7hdF2Y954R1QtedtK4Nx"
+######### Prepare for streamR
+#my_oauth <- OAuthFactory$new(consumerKey = api_key, consumerSecret = api_secret, 
+#requestURL = requestURL, accessURL = accessURL, authURL = authURL)
+#my_oauth$handshake(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))
+#save(my_oauth, file = "my_oauth.Rdata")
+#load("my_oauth.Rdata")
+
+######### Prepare for twitteR
+#setup_twitter_oauth(api_key, api_secret, access_token, access_token_secret)
+
+```
+
+```{r}
+load("my_oauth.Rdata")
+
+  filterStream( file="Tweet.json", track="christmas",
+      locations=c(-74,40,-73,41), timeout=1800, oauth=my_oauth )
+```
+
+```{r}
+tweets_raw.df <- parseTweets("Tweet.json",verbose = FALSE)
+
+
+keep <- c("text","lang","listed_count","geo_enabled","statuses_count","followers_count",
+          "favourites_count","friends_count","time_zone","country_code","full_name",
+          "place_lat","place_lon")
+
+tweets.df <- tweets_raw.df[,keep];
+
+
+write.csv(tweets.df,"tweets_df.csv") 
+
+```
+
+```{r}
+
+#yoo
+
+```
+
+```{r}
+
+# install.packages("ggmap")
+library(ggmap)
+```
+
+```{r} 
+tweets.df <- tweets.df[tweets.df$lang=="en",]
+tweets.df <- tweets.df[tweets.df$country_code=="US",]
+tweets.df <- tweets.df[tweets.df$geo_enabled==TRUE,]
+tweets.df <- tweets.df[tweets.df$place_lat >25 & tweets.df$place_lat <50 & 
+                         tweets.df$place_lon > -125 & tweets.df$place_lon< -66,]
+
+write.csv(tweets.df,"cleaned_tweets_df.csv") 
+
+
+#filter with place
+ca <- data.frame(filter(tweets.df, grepl(', CA', full_name)))
+il <- data.frame(filter(tweets.df, grepl(', IL', full_name)))
+ma <- data.frame(filter(tweets.df, grepl(', MA', full_name)))
+ny <- data.frame(filter(tweets.df, grepl(', NY', full_name)))
+dc <- data.frame(filter(tweets.df, grepl(', DC', full_name)))
+```
+
+```{r, warning=FALSE,message=FALSE}
+qmplot(place_lon, place_lat, data = ny, colour = I('orange'), size = I(2),
+       mapcolor = "bw", main="NY")
+qmplot(place_lon, place_lat, data = ma, colour = I('green'), size = I(2), 
+       mapcolor = "bw", main="MA")
+qmplot(place_lon, place_lat, data = ca, colour = I('blue'), size = I(2), 
+       mapcolor = "bw",main="CA")
+qmplot(place_lon, place_lat, data = tweets.df, colour = I('red'), size = I(2), 
+       mapcolor = "bw",main="USA")
+```
+##According to the map of the christmas tweets, we can see most of the tweets are mainly from coastal states,like New York, California and Massachusetts, which are the cities for bussiness, fashion and so on. So the next step is to have a closer study of those three states.
+
+```{r}
+#add new variable state
+ny[,"state"] <- rep("NY",nrow(ny));
+ca[,"state"] <- rep("CA",nrow(ca));
+ma[,"state"] <- rep("MA",nrow(ma));
+
+#get city name
+ny$full_name <- as.character(ny$full_name);
+ma$full_name <- as.character(ma$full_name);
+ca$full_name <- as.character(ca$full_name);
+tweets.df$full_name <- as.character(tweets.df$full_name);
+
+get_city <- function(x){
+  city_name <- c()
+  name <- strsplit(x$full_name,",")
+  for(i in 1:nrow(x)){
+    city_name <- c(city_name,name[[i]][1])
+  }
+  return(city_name)
+}
+```
+
+```{r}
+#transform to factor
+ny[,"city"] <- factor(get_city(ny));
+ma[,"city"] <- factor(get_city(ma));
+ca[,"city"] <- factor(get_city(ca));
+tweets.df[,"city"] <- factor(get_city(tweets.df))
+
+#combine
+total <- rbind(rbind(ny,ma),ca)
+total$lang <- as.character(total$lang)
+tweets.df$lang <- as.character(tweets.df$lang)
+total_us <- filter(tweets.df,lang=="en")
+total <- filter(total,lang=="en")
+# tweets number for each city in each state
+count <- summary(ny$city)[1:15];ny_city_count <- as.data.frame(count)
+count <- summary(ma$city)[1:15];ma_city_count <- as.data.frame(count)
+count <- summary(ca$city)[1:15];ca_city_count <- as.data.frame(count)
+count <- summary(tweets.df$city)[1:15];us_city_count <- as.data.frame(count)
+```
+
+```{r}
+#plot
+nycityplot <- ggplot(ny_city_count,aes(reorder(rownames(ny_city_count),count),count))+
+  geom_bar(stat = "identity")+coord_flip()+xlab("City")+ggtitle("NY")
+nycityplot
+
+macityplot <- ggplot(ma_city_count,aes(reorder(rownames(ma_city_count),count),count))+
+  geom_bar(stat = "identity")+coord_flip()+xlab("City")+ggtitle("MA")
+macityplot
+
+cacityplot <- ggplot(ca_city_count,aes(reorder(rownames(ca_city_count),count),count))+
+  geom_bar(stat = "identity")+coord_flip()+xlab("City")+ggtitle("CA")
+cacityplot
+
+uscityplot <- ggplot(us_city_count,aes(reorder(rownames(us_city_count),count),count))+
+  geom_bar(stat = "identity")+coord_flip()+xlab("City")+ggtitle("US")
+uscityplot
+```
+## 
+```{r}
+pairs(~listed_count+statuses_count+followers_count+favourites_count+friends_count, data=total_us)
+
+cor(total[,c(3,5,6,7,8)])
+
+```
+##Based on R result,  the followers_count tends to have a correlation with the list_count, and the change of one can affect another one noticeably. So the next step is to have a model to study those two variables.
+
+```{r}
+model_fl <- lm(followers_count~listed_count,data=total_us)
+summary(model_fl)
+ggplot(total,aes(x=listed_count,y=followers_count))+geom_point()+geom_smooth(method = "lm")
+ggplot
+#Analysis of regression: 
+par(mfrow=c(1,2))
+plot(model_fl,1)
+plot(model_fl,2)
+```
+## The listed_count is the number of public lists that this user is a member of. Based on the p-value of the model of listed_count and followers_count, the simple linear regression is significant. We can see that the more public lists that this user is a memeber of, more follower the user have. As list increase by 1 , the follower count will increase by approximately 109. 
+
+```{r}
+##Then, to further study the social media impact in different cities, the follower count distribution is computated.
+#add ggplot code
+a <- ggplot(data=tweets.df, aes(followers_count)) +
+  geom_histogram(breaks = seq(0,5000,by=250),
+                 col = "blue",
+                 fill = "white") +
+  labs(title = "Followers Count Distribution in US") +
+  labs(x="Followers", y = "Count of each followers_count")+
+  theme(plot.title = element_text(hjust=0.5))
+#printing the graphs
+print(a)
+```
+##From the followers count distribution in US, we can see that most of those christmas tweets are from blogger with under 1000 followers. So we can see public use tweets to celebrate christma. More follower the blogger have more impact the tweets might bring to the public, so we can see the christmas tweets will bring a great impact to the public to celebrate the holidays.
+
+```{r}
+#ggplot code for followers count distribution in California
+c <- ggplot(data=ca, aes(followers_count)) +
+  geom_histogram(breaks = seq(0,5000,by=250),
+                 col = "blue",
+                 fill = "white") +
+  labs(title = "Followers Count Distribution in California") +
+  labs(x="Followers", y = "Count")+
+  theme(plot.title = element_text(hjust=0.5))
+#printing the graphs
+print(c)
+
+# ggplot code for followers count distribution in Massachusetts
+e <- ggplot(data=ma, aes(followers_count)) +
+  geom_histogram(breaks = seq(0,5000,by=250),
+                 col = "blue",
+                 fill = "white") +
+  labs(title = "Followers Count Distribution in Massachusetts") +
+  labs(x="Followers", y = "Count")+
+  theme(plot.title = element_text(hjust=0.5))
+#printing the graphs
+print(e)
+
+#ggplot code for followers count distribution in New York
+f <- ggplot(data=ny, aes(followers_count)) +
+  geom_histogram(breaks = seq(0,5000,by=250),
+                 col = "blue",
+                 fill = "white") +
+  labs(title = "Followers Count Distribution in New York") +
+  labs(x="Followers", y = "Count")+
+  theme(plot.title = element_text(hjust=0.5))
+#printing the graphs
+print(f)
+```
+##Comparing the followers distribution in big and socialable states like California, Massachusetts and New York, we can see that New York's christmas tweets are from blogger with the most followers, which is understandable since there are most population and companies there. Twitter plays a much larger role in public's life and work. in New York. Generally, we can see that Massachussets has the least tweets which might be due the data is collected during the final period, and the majority of sociable population in MA is students who did't tweet that much at that time. For California, there is moderate tweets with moderate followers.
+
+
+
