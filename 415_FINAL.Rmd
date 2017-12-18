@@ -85,9 +85,10 @@ write.csv(tweets.df,"tweets_df.csv")
 #yoo
 
 ```
-##After searching tweets for 30 mins, cleaning it and obtaining locations' information, I get a data frames with all the information including listed counts,statuse count, followers count, favourites count,time zone, country code, city, states, longitude, latitude.
+After searching tweets for 30 mins, cleaning it and obtaining locations' information, I get a data frames with all the information including listed counts,statuse count, followers count, favourites count,time zone, country code, city, states, longitude, latitude.
 
-##To have a general of views of the distribution of those tweets especially in different cities in US, we use mapping to see which cities might be my insteret of studies.
+
+To have a general of views of the distribution of those tweets especially in different cities in US, we use mapping to see which cities might be my insteret of studies.
 ```{r}
 
 # install.packages("ggmap")
@@ -122,10 +123,9 @@ qmplot(place_lon, place_lat, data = ca, colour = I('blue'), size = I(2),
 qmplot(place_lon, place_lat, data = tweets.df, colour = I('red'), size = I(2), 
        mapcolor = "bw",main="USA")
 ```
-##According to the map of the christmas tweets, we can see most of the tweets are mainly from coastal states,like New York, California and Massachusetts, which are the cities for bussiness, fashion and so on. So the next step is to have a closer study of those three states.
+According to the map of the christmas tweets, we can see most of the tweets are mainly from coastal states,like New York, California and Massachusetts, which are the cities for bussiness, fashion and so on. So the next step is to have a closer study of those three states.
 
-
-II Statistical Analysis
+## III Statistical Analysis 
 Having the targeted states, Some question below will be explored:
 1. Whether different cities has different christmas atmosphere.
 2. Whether location of the cities affect the popularity of tweets.
@@ -198,7 +198,8 @@ pairs(~listed_count+statuses_count+followers_count+favourites_count+friends_coun
 cor(total[,c(3,5,6,7,8)])
 
 ```
-##Based on R result,  the followers_count tends to have a correlation with the list_count, and the change of one can affect another one noticeably. So the next step is to have a model to study those two variables.
+Based on R result,  the followers_count tends to have a correlation with the list_count, and the change of one can affect another one noticeably. So the next step is to have a model to study those two variables.
+
 
 ```{r}
 model_fl <- lm(followers_count~listed_count,data=total_us)
@@ -210,7 +211,8 @@ par(mfrow=c(1,2))
 plot(model_fl,1)
 plot(model_fl,2)
 ```
-## The listed_count is the number of public lists that this user is a member of. Based on the p-value of the model of listed_count and followers_count, the simple linear regression is significant. We can see that the more public lists that this user is a memeber of, more follower the user have. As list increase by 1 , the follower count will increase by approximately 109. 
+The listed_count is the number of public lists that this user is a member of. Based on the p-value of the model of listed_count and followers_count, the simple linear regression is significant. We can see that the more public lists that this user is a memeber of, more follower the user have. As list increase by 1 , the follower count will increase by approximately 109
+
 
 ```{r}
 ##Then, to further study the social media impact in different cities, the follower count distribution is computated.
