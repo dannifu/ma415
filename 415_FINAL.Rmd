@@ -4,14 +4,14 @@ author: "Danni Fu"
 date: "2017/12/15"
 output: pdf_document
 ---
-## I Introduction
+## I. Introduction
 
 Nowadays, as rapid growth of usage of internet, social media plays a larger and larger role on the daily life of the public. The social media can reflect different cities' atmosphere of holidays. Bloggers with a lot of followers can affect the costumers' shopping decisions. Then, the another role Twitter can play in Christmas is social marketing, since it can released a new infographic which outlines the opportunities on Twitter for marketers ahead of the holiday season. 
 
 In order to figure out what Twitter users, are talking about Christmas, all the tweets contains hashtag about Christmas and the geographical location info are collected, researches about regions that has the majority celebrate christmas and related analysis would be useful for commercial purposes.
 
 
-## II Dataset Summary
+## II. Dataset Summary
 
 In this project, all the data come from Twitter. The data of this project includes tweets mentioning christmas collecting in 30 mins at around 1 pm in Eastern stardard time..
   
@@ -133,7 +133,7 @@ According to the map of the christmas tweets, we can see most of the tweets are 
 
 
 
-## IV Statistical Analysis 
+## IV. Statistical Analysis 
 
 Having the targeted states, Some question below will be explored:
 1. Whether different cities has different christmas atmosphere.
@@ -200,15 +200,17 @@ uscityplot <- ggplot(us_city_count,aes(reorder(rownames(us_city_count),count),co
   geom_bar(stat = "identity")+coord_flip()+xlab("City")+ggtitle("US")
 uscityplot
 ```
-According to plots, Manhattan is the cities where those christmas tweets are from. 
+According to plots of US, Manhattan is the cities where most of those christmas tweets are from. Based on the plots of each interested states, the city which is the financial center of the states tend to have the highest tweets counts, for example, New York is Manhattan, Masschusetts is Boston. However, this seems not right for California which might due to the data collecting time is morning of California. Most of those users are less likely tweets at that time, so the data for the cities might not be representative for California. 
 
+
+To investigate the relationship between each pair of information factors, the scatter matrix plot and the corrlation tables are made to see any sigificant simple regression.
 ```{r}
 pairs(~listed_count+statuses_count+followers_count+favourites_count+friends_count, data=total_us)
 
 cor(total[,c(3,5,6,7,8)])
 
 ```
-Based on R result,  the followers_count tends to have a correlation with the list_count, and the change of one can affect another one noticeably. So the next step is to have a model to study those two variables.
+Based on R result, the followers_count tends to have a correlation with the list_count, and the change of one can affect another one noticeably. So the next step is to have a model to study those two variables.
 
 
 ```{r}
