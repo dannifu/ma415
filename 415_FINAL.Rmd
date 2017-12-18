@@ -4,8 +4,11 @@ author: "Danni Fu"
 date: "2017/12/15"
 output: pdf_document
 ---
-#introduction
-Nowadays, as rapid growth of usage of internet, social media plays a larger and larger role on the daily life of the public. The social media can reflect different cities' atmosphere of holidays. Also bloggers with a lot of followers can affect the costumers' shopping decisions. Then, the another role Twitter can play in Christmas is social marketing, since it can released a new infographic which outlines the opportunities on Twitter for marketers ahead of the holiday season. With the use of Twitter API, all the tweets contains hashtag about Christmas and the geographical location info are collected, researches about regions that has the majority celebrate christmas and related analysis would be useful for commercial purposes. 
+## I Introduction
+
+Nowadays, as rapid growth of usage of internet, social media plays a larger and larger role on the daily life of the public. The social media can reflect different cities' atmosphere of holidays. Bloggers with a lot of followers can affect the costumers' shopping decisions. Then, the another role Twitter can play in Christmas is social marketing, since it can released a new infographic which outlines the opportunities on Twitter for marketers ahead of the holiday season. 
+
+In order to figure out what Twitter users, are talking about Christmas, all the tweets contains hashtag about Christmas and the geographical location info are collected, researches about regions that has the majority celebrate christmas and related analysis would be useful for commercial purposes.
 
 ```{r setup, include = FALSE}
 # prepare packages
