@@ -279,7 +279,11 @@ Comparing the followers distribution in big and socialable states like Californi
 
 
 ## V. Shiny
+For the Shiny application, I created a navbar with all the graphs that I created earlier in different tabs, including Maps, statistic models. Descriptions of each graph are also included
 
+All shiny codes are included in the folder called "shiny_app".
+
+Shiny application are available through here: https://dannif.shinyapps.io/shiny/
 
 ## VI. Future Improvements 
 
