@@ -59,10 +59,10 @@ library(topicmodels)
 ```
 
 ```{r}
-load("my_oauth.Rdata")
-
-  filterStream( file="Tweet.json", track="christmas",
-      locations=c(-74,40,-73,41), timeout=1800, oauth=my_oauth )
+#load("my_oauth.Rdata")
+#
+#  filterStream( file="Tweet.json", track="christmas",
+#      locations=c(-74,40,-73,41), timeout=1800, oauth=my_oauth )
 ```
 
 ```{r}
@@ -80,11 +80,6 @@ write.csv(tweets.df,"tweets_df.csv")
 
 ```
 
-```{r}
-
-#yoo
-
-```
 After searching tweets for 30 mins, cleaning it and obtaining locations' information, I get a data frames with all the information including listed counts,statuse count, followers count, favourites count,time zone, country code, city, states, longitude, latitude.
 
 
@@ -99,9 +94,7 @@ To have a general of views of the distribution of those tweets especially in dif
 
 # install.packages("ggmap")
 library(ggmap)
-```
 
-```{r} 
 tweets.df <- tweets.df[tweets.df$lang=="en",]
 tweets.df <- tweets.df[tweets.df$country_code=="US",]
 tweets.df <- tweets.df[tweets.df$geo_enabled==TRUE,]
@@ -112,36 +105,30 @@ write.csv(tweets.df,"cleaned_tweets_df.csv")
 
 
 #filter with place
-ca <- data.frame(filter(tweets.df, grepl(', CA', full_name)))
-il <- data.frame(filter(tweets.df, grepl(', IL', full_name)))
-ma <- data.frame(filter(tweets.df, grepl(', MA', full_name)))
 ny <- data.frame(filter(tweets.df, grepl(', NY', full_name)))
 dc <- data.frame(filter(tweets.df, grepl(', DC', full_name)))
+il <- data.frame(filter(tweets.df, grepl(', IL', full_name)))
+ca <- data.frame(filter(tweets.df, grepl(', CA', full_name)))
+ma <- data.frame(filter(tweets.df, grepl(', MA', full_name)))
 ```
 
 ```{r, warning=FALSE,message=FALSE}
 qmplot(place_lon, place_lat, data = ny, colour = I('orange'), size = I(2),
        mapcolor = "bw", main="NY")
-qmplot(place_lon, place_lat, data = ma, colour = I('green'), size = I(2), 
-       mapcolor = "bw", main="MA")
-qmplot(place_lon, place_lat, data = ca, colour = I('blue'), size = I(2), 
-       mapcolor = "bw",main="CA")
-qmplot(place_lon, place_lat, data = tweets.df, colour = I('red'), size = I(2), 
+qmplot(place_lon, place_lat, data = tweets.df, colour = I('red'), size = I(2), alpha=I(0.4),
        mapcolor = "bw",main="USA")
 ```
-According to the map of the christmas tweets, we can see most of the tweets are mainly from coastal states,like New York, California and Massachusetts, which are the cities for bussiness, fashion and so on. So the next step is to have a closer study of those three states.
+According to the map of the christmas tweets, we can see most of the tweets are mainly from New York, which are the cities for bussiness, fashion and so on. So the next step is to have a closer study of New York.
 
 
 
 ## IV. Statistical Analysis 
 
 Having the targeted states, Some question below will be explored:
-1. Whether different cities has different christmas atmosphere.
-2. Whether location of the cities affect the popularity of tweets.
-3. What is significant relationship between each pair of different information countable factors of the users, like followers, favorites, lists that uses belong to and so on.
+1. Whether location of the cities affect the popularity of tweets.
+2. What is significant relationship between each pair of different information countable factors of the users, like followers, favorites, lists that uses belong to and so on.
 
 ```{r}
-#add new variable state
 ny[,"state"] <- rep("NY",nrow(ny));
 ca[,"state"] <- rep("CA",nrow(ca));
 ma[,"state"] <- rep("MA",nrow(ma));
@@ -160,48 +147,33 @@ get_city <- function(x){
   }
   return(city_name)
 }
-```
 
-```{r}
 #transform to factor
 ny[,"city"] <- factor(get_city(ny));
-ma[,"city"] <- factor(get_city(ma));
-ca[,"city"] <- factor(get_city(ca));
+#ma[,"city"] <- factor(get_city(ma));
+#ca[,"city"] <- factor(get_city(ca));
 tweets.df[,"city"] <- factor(get_city(tweets.df))
 
 #combine
-total <- rbind(rbind(ny,ma),ca)
+total <- ny
 total$lang <- as.character(total$lang)
 tweets.df$lang <- as.character(tweets.df$lang)
 total_us <- filter(tweets.df,lang=="en")
 total <- filter(total,lang=="en")
 # tweets number for each city in each state
 count <- summary(ny$city)[1:15];ny_city_count <- as.data.frame(count)
-count <- summary(ma$city)[1:15];ma_city_count <- as.data.frame(count)
-count <- summary(ca$city)[1:15];ca_city_count <- as.data.frame(count)
+#count <- summary(ma$city)[1:15];ma_city_count <- as.data.frame(count)
+#count <- summary(ca$city)[1:15];ca_city_count <- as.data.frame(count)
 count <- summary(tweets.df$city)[1:15];us_city_count <- as.data.frame(count)
 ```
 
 ```{r}
 #plot
-nycityplot <- ggplot(ny_city_count,aes(reorder(rownames(ny_city_count),count),count))+
-  geom_bar(stat = "identity")+coord_flip()+xlab("City")+ggtitle("NY")
-nycityplot
-
-macityplot <- ggplot(ma_city_count,aes(reorder(rownames(ma_city_count),count),count))+
-  geom_bar(stat = "identity")+coord_flip()+xlab("City")+ggtitle("MA")
-macityplot
-
-cacityplot <- ggplot(ca_city_count,aes(reorder(rownames(ca_city_count),count),count))+
-  geom_bar(stat = "identity")+coord_flip()+xlab("City")+ggtitle("CA")
-cacityplot
-
 uscityplot <- ggplot(us_city_count,aes(reorder(rownames(us_city_count),count),count))+
   geom_bar(stat = "identity")+coord_flip()+xlab("City")+ggtitle("US")
 uscityplot
 ```
-According to plots of US, Manhattan is the cities where most of those christmas tweets are from. Based on the plots of each interested states, the city which is the financial center of the states tend to have the highest tweets counts, for example, New York is Manhattan, Masschusetts is Boston. However, this seems not right for California which might due to the data collecting time is morning of California. Most of those users are less likely tweets at that time, so the data for the cities might not be representative for California. 
-
+According to plots of US, Brooklyn is the cities where most of those christmas tweets are from. Based on the plots of each interested states, the city which is the fashion center of the states tend to have the highest tweets counts, for example, New York is Manhattan.
 
 To investigate the relationship between each pair of information factors, the scatter matrix plot and the corrlation tables are made to see any sigificant simple regression.
 ```{r}
@@ -242,28 +214,6 @@ print(a)
 From the followers count distribution in US, we can see that most of those christmas tweets are from blogger with under 1000 followers. So we can see public use tweets to celebrate christma. More follower the blogger have more impact the tweets might bring to the public, so we can see the christmas tweets will bring a great impact to the public to celebrate the holidays.
 
 ```{r}
-#ggplot code for followers count distribution in California
-c <- ggplot(data=ca, aes(followers_count)) +
-  geom_histogram(breaks = seq(0,5000,by=250),
-                 col = "blue",
-                 fill = "white") +
-  labs(title = "Followers Count Distribution in California") +
-  labs(x="Followers", y = "Count")+
-  theme(plot.title = element_text(hjust=0.5))
-#printing the graphs
-print(c)
-
-# ggplot code for followers count distribution in Massachusetts
-e <- ggplot(data=ma, aes(followers_count)) +
-  geom_histogram(breaks = seq(0,5000,by=250),
-                 col = "blue",
-                 fill = "white") +
-  labs(title = "Followers Count Distribution in Massachusetts") +
-  labs(x="Followers", y = "Count")+
-  theme(plot.title = element_text(hjust=0.5))
-#printing the graphs
-print(e)
-
 #ggplot code for followers count distribution in New York
 f <- ggplot(data=ny, aes(followers_count)) +
   geom_histogram(breaks = seq(0,5000,by=250),
@@ -275,8 +225,7 @@ f <- ggplot(data=ny, aes(followers_count)) +
 #printing the graphs
 print(f)
 ```
-Comparing the followers distribution in big and socialable states like California, Massachusetts and New York, we can see that New York's christmas tweets are from blogger with the most followers, which is understandable since there are most population and companies there. Twitter plays a much larger role in public's life and work. in New York. Generally, we can see that Massachussets has the least tweets which might be due the data is collected during the final period, and the majority of sociable population in MA is students who did't tweet that much at that time. For California, there is moderate tweets with moderate followers.
-
+According to the followers distribution in big and socialable states New York, we can see that New York's christmas tweets are from blogger with the most followers, which is understandable since there are most population and companies there. Twitter plays a much larger role in public's life and work. in New York. 
 
 ## V. Shiny
 For the Shiny application, I created a navbar with all the graphs that I created earlier in different tabs, including Maps, statistic models. Descriptions of each graph are also included
