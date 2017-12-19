@@ -1,0 +1,10 @@
+name: shiny
+title:
+username:
+account: dannif
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 250102
+bundleId: 1142013
+url: https://dannif.shinyapps.io/shiny/
+when: 1513653141.66447
